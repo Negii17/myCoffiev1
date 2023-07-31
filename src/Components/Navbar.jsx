@@ -1,9 +1,19 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "../GlobalState/GlobalContext";
 
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+></link>;
+
 export default function Navbar() {
-  const [globalState] = useContext(GlobalContext);
+  const [globalState, globalDispacth] = useContext(GlobalContext);
+  console.log("globalstate in Navbar", globalState);
+
+  const navigate = useNavigate();
+  // console.log("Global state di Navbar", globalState);
+
   return (
     <div>
       <nav
@@ -15,13 +25,25 @@ export default function Navbar() {
             <img
               src={require("../Images/Cofie_logo2.png")}
               alt=""
-              style={{ width: "40px", height: "40px", marginRight: "10px" }}
+              style={{
+                width: "40px",
+                height: "40px",
+                marginRight: "10px",
+                marginBottom: "9px",
+              }}
             />
             <span
               className="fw-bold"
-              style={{ color: "#198754", height: "100px", width: "100px" }}
+              style={{
+                color: "#198754",
+                height: "100px",
+                width: "100px",
+                animation: "flicker 1.5s infinite alternate",
+                fontSize: "30px",
+                fontFamily: "cursive",
+              }}
             >
-              CoffeeLand
+              My Coffie
             </span>
           </Link>
           <button
@@ -41,7 +63,42 @@ export default function Navbar() {
                 <>
                   <li className="nav-item">
                     <Link className="nav-link" to="/cart">
-                      <img src={require("../Images/Vector.png")} alt="" />
+                      <div
+                        style={{
+                          width: "80px",
+                          textAlign: "center",
+                          verticalAlign: "middle",
+                          position: "relative",
+                        }}
+                      >
+                        {globalState.dataCarts.length > 0 ? (
+                          <>
+                            <span
+                              style={{
+                                backgroundColor: "red",
+                                borderRadius: "50%",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                color: "white",
+                                position: "absolute",
+                                right: "14px",
+                                top: "2px",
+                                padding: "2px 8px",
+                                fontSize: "12px",
+                                fontFamily: "sans-serif",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              {globalState.dataCarts.length}
+                            </span>
+                          </>
+                        ) : (
+                          <></>
+                        )}
+
+                        <img src={require("../Images/Vector.png")} alt="" />
+                      </div>
                     </Link>
                   </li>
                   <li className="nav-item dropdown">
@@ -52,25 +109,35 @@ export default function Navbar() {
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
-                      Hello, Jun
+                      Hello,{" "}
+                      {globalState.dataUserLogin.fullname
+                        ? globalState.dataUserLogin.fullname
+                        : "Unknown"}
                     </a>
                     <ul className="dropdown-menu dropdown-menu-end">
                       <li>
-                        <a className="dropdown-item" href="#">
-                          Action
-                        </a>
+                        <Link className="dropdown-item" to="/Profil">
+                          <i className="bi bi-person"></i>Profil
+                        </Link>
                       </li>
                       <li>
                         <a className="dropdown-item" href="#">
-                          Another action
+                          <i className="bi-cash-coin"></i> My transactions
                         </a>
                       </li>
                       <li>
                         <hr className="dropdown-divider" />
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#">
-                          Something else here
+                        <a
+                          href="/"
+                          onClick={() => {
+                            localStorage.clear();
+                          }}
+                          style={{ color: "red" }}
+                          className="dropdown-item"
+                        >
+                          Log Out
                         </a>
                       </li>
                     </ul>
@@ -79,17 +146,13 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <li className="nav-item">
+                  <li>
                     <Link
-                      className="nav-link btn btn-outline-success me-3"
+                      className="neonText"
+                      style={{ color: "#13A52B", textDecoration: "none" }}
                       to="/Login"
                     >
                       Login
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link className="nav-link btn btn-success" to="/register">
-                      Register
                     </Link>
                   </li>
                 </>
