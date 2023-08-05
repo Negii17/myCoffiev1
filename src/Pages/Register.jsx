@@ -40,29 +40,7 @@ export default function Register() {
       setStatusAlert(error.response.data.status);
     }
   };
-  useEffect(() => {
-    checkToken();
-  }, []);
 
-  const checkToken = async () => {
-    try {
-      if (localStorage.token) {
-        const token = localStorage.token;
-        // console.log("chek token disini", token);
-        const responseCheckToken = await ApiVersi1.get("/checktoken", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        // console.log("Cek token: ", responseCheckToken);
-        globalDispacth({
-          type: "PROCESS_LOGIN",
-          data: responseCheckToken.data.data,
-        });
-        navigate("/");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
   return (
     <div>
       <div className="container" style={{ marginTop: "70px" }}>

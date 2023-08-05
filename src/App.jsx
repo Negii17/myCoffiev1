@@ -13,6 +13,7 @@ import PrivateRoute from "./Components/PrivateRoute";
 import Profil from "./Pages/Profil";
 import { GlobalContext } from "./GlobalState/GlobalContext";
 import { ApiVersi1 } from "./Config/ApiConfig";
+import PublicRoute from "./Components/PublicRoute";
 
 function App() {
   const [globalState, globalDispacth] = useContext(GlobalContext);
@@ -63,8 +64,10 @@ function App() {
       <Routes>
         <Route path="*" element={<PageNotFound />} />
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route element={<PublicRoute />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/detail-products/:id" element={<DetailProucts />} />
           <Route path="/Cart" element={<Cart />} />

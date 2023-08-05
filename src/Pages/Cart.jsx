@@ -20,6 +20,7 @@ export default function Cart() {
       },
     });
   };
+  let totalHarga = 0;
 
   return (
     <div>
@@ -27,10 +28,10 @@ export default function Cart() {
         <h2 style={{ fontFamily: "cursive" }}>My Cart</h2>
         {globalState.dataCarts.length > 0 ? (
           <div className="row">
-            <div className="col-lg-8">
-              <ul className="list-group list-group-flush">
-                {globalState.dataCarts.map((item, index) => {
-                  return (
+            {globalState.dataCarts.map((item, index) => {
+              return (
+                <div className="col-lg-8">
+                  <ul className="list-group list-group-flush">
                     <div key={index}>
                       <li className="list-group-item">
                         <div className="row">
@@ -137,36 +138,36 @@ export default function Cart() {
                         </div>
                       </li>
                     </div>
-                  );
-                })}
-              </ul>
-            </div>
-            {globalState.dataCarts.map((item, index) => {
-              return (
-                <div className="col-lg-4">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nomor Telpon"
-                    style={{ margin: "5px" }}
-                  />
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Alamat"
-                    style={{ margin: "5px" }}
-                  />
-                  <input
-                    style={{
-                      height: "10rem",
-                      margin: "5px",
-                      textAlign: "left",
-                    }}
-                    type="text"
-                    className="form-control"
-                    placeholder="Catatan"
-                  />
-                  <h3>Total :{+(item.qty * item.price)}</h3>
+                  </ul>
+                  <div className="col-lg-4">
+                    <div>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Alamat"
+                        style={{ marginBottom: "5px" }}
+                      />
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Nomer Hp"
+                        style={{ marginBottom: "5px" }}
+                      />
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Catatan"
+                        style={{ marginBottom: "5px" }}
+                      />
+                      <p> Harga : </p>
+                      <button
+                        className="btn btn-outline-success w-80"
+                        style={{ marginLeft: "20%" }}
+                      >
+                        Payment
+                      </button>
+                    </div>
+                  </div>
                 </div>
               );
             })}

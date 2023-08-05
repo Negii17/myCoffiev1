@@ -43,14 +43,7 @@ export default function Home() {
           {dataProduct.map((item, index) => {
             return (
               <div key={index} className="col">
-                <div
-                  className="card shadow "
-                  // style={{
-                  //   height: "20rem",
-                  //   width: "16rem",
-                  //   marginBottom: "12rem",
-                  // }}
-                >
+                <div className="card shadow ">
                   <div
                     style={{
                       backgroundColor: "#FDF5E6",
