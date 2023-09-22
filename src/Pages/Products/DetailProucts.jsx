@@ -1,13 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { dataProduct } from "./Data";
+import { GlobalContext } from "../../GlobalState/GlobalContext";
 // import { Link } from "react-router-dom";
 
 export default function DetailProucts() {
   // relog g kereset
   const { id: idProduct } = useParams();
   // relog g kereset
+  const [globalState, globalDispacth] = useContext(GlobalContext);
+  const navigate = useNavigate;
+
+  const [searchResultsDataProduct, setsearchResultsDataProduct] =
+    useState(dataProduct);
 
   const [dataProductById, setDataProductById] = useState();
   useEffect(() => {
@@ -17,6 +23,19 @@ export default function DetailProucts() {
     const data = dataProduct.find((item) => item.id === idProduct);
     // console.log(data);
     setDataProductById(data);
+  };
+
+  const handleOrder = (id) => {
+    if (globalState.isLogin) {
+      const dataById = searchResultsDataProduct.find((item) => item.id === id);
+      console.log("idproduct", dataById);
+      globalDispacth({
+        type: "SEND_TO_CART",
+        data: dataById,
+      });
+    } else {
+      navigate("/login");
+    }
   };
 
   return (
@@ -38,11 +57,21 @@ export default function DetailProucts() {
             </>
           )}
         </div>
-        <div className="col-lg-8" style={{ marginTop: "50px" }}>
+        <div className="col-lg-8" style={{ marginTop: "80px" }}>
           {dataProductById && (
             <>
               <h2>{dataProductById.productName}</h2>
               <h2>{dataProductById.price}</h2>
+              <p>aogdiagdiuga9uwihdouiahjdoiwhdohawda</p>
+              <button
+                className="btn btn-success"
+                style={{ marginTop: "100px", width: "100px" }}
+                onClick={() => {
+                  handleOrder(dataProductById.id);
+                }}
+              >
+                Order
+              </button>
             </>
           )}
         </div>

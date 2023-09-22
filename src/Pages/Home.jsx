@@ -1,18 +1,31 @@
-import React, { useContext, useState } from "react";
-import { dataProduct } from "./Products/Data";
+import React, { useContext, useEffect, useState } from "react";
+// import { dataProduct } from "./Products/Data";
 import { GlobalContext } from "../GlobalState/GlobalContext";
 import { useNavigate } from "react-router-dom";
+import { ApiVersi1 } from "../Config/ApiConfig";
+import { formatRupiah } from "../Config/Config";
 
 export default function Home() {
   const [globalState, globalDispatch] = useContext(GlobalContext);
   const navigate = useNavigate();
+  useEffect(() => {
+    getDataProductApi();
+  }, []);
 
-  const [searchResultsDataProduct, setsearchResultsDataProduct] =
-    useState(dataProduct);
+  const setFormatRupiah = formatRupiah;
+  const [allDataProducts, setAllDataProducts] = useState([]);
+  const getDataProductApi = async () => {
+    const response = await ApiVersi1.get("/getdataproducts");
+    // console.log(response);
+    setAllDataProducts(response.data.data);
+  };
+
+  // const [searchResultsDataProduct, setsearchResultsDataProduct] =
+  //   useState(allDataProducts);
 
   const handleOrder = (id) => {
     if (globalState.isLogin) {
-      const dataById = searchResultsDataProduct.find((item) => item.id === id);
+      const dataById = allDataProducts.find((item) => item.id === id);
       console.log("idproduct", dataById);
       globalDispatch({
         type: "SEND_TO_CART",
@@ -20,6 +33,38 @@ export default function Home() {
       });
     } else {
       navigate("/login");
+    }
+  };
+
+  const handleOrder2 = async (idParam) => {
+    try {
+      const token = localStorage.token;
+      const response = await ApiVersi1.post(
+        "/adddatacart",
+        { productId: idParam },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log(response);
+      getDataCart();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getDataCart = async () => {
+    try {
+      const response = await ApiVersi1.get("/getdatacart");
+      // setDataCarts(response.data.data);
+      globalDispatch({
+        type: "PROCCESS_GET_DATA_CART",
+        data: response.data.data,
+      });
+
+      console.log(response);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -40,7 +85,7 @@ export default function Home() {
           Let's Order . . .
         </h2>
         <div className="row row-cols-1 row-cols-md-4 g-4 ">
-          {dataProduct.map((item, index) => {
+          {allDataProducts.map((item, index) => {
             return (
               <div key={index} className="col">
                 <div className="card shadow ">
@@ -50,18 +95,18 @@ export default function Home() {
                     }}
                   >
                     <img
-                      src={require(`../Images/${item.img}`)}
-                      className="card-img-top"
-                      alt="..."
-                      // style={{
-                      //   height: "20rem",
-                      //   width: "18rem",
-                      //   margin: "0.5rem",
-                      // }}
+                    // src={require(`../Images/${item.img}`)}
+                    // className="card-img-top"
+                    // alt="..."
+                    // style={{
+                    //   height: "20rem",
+                    //   width: "18rem",
+                    //   margin: "0.5rem",
+                    // }}
                     />
                     <div className="card-body">
                       <h5 className="card-title">{item.productName}</h5>
-                      <p className="card-text">{item.price}</p>
+                      <p className="card-text">{setFormatRupiah(item.price)}</p>
                       <div className="row">
                         <div className="col-lg-6">
                           <button
@@ -81,7 +126,8 @@ export default function Home() {
                         <div className="col-lg-6">
                           <button
                             onClick={() => {
-                              handleOrder(item.id);
+                              // handleOrder(item.id);
+                              handleOrder2(item.id);
                             }}
                             className="btn btn-success w-100"
                           >

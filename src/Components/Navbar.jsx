@@ -1,6 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "../GlobalState/GlobalContext";
+import { ApiVersi1 } from "../Config/ApiConfig";
 
 <link
   rel="stylesheet"
@@ -9,7 +10,9 @@ import { GlobalContext } from "../GlobalState/GlobalContext";
 
 export default function Navbar() {
   const [globalState, globalDispacth] = useContext(GlobalContext);
-  console.log("globalstate in Navbar", globalState);
+
+  const [dataCarts, setDataCarts] = useState([]);
+  // console.log("globalstate in Navbar", globalState);
 
   const navigate = useNavigate();
   // console.log("Global state di Navbar", globalState);
@@ -61,17 +64,44 @@ export default function Navbar() {
             <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
               {globalState.isLogin ? (
                 <>
-                  <li className="nav-item">
-                    <Link className="nav-link" to="/cart">
-                      <div
-                        style={{
-                          width: "80px",
-                          textAlign: "center",
-                          verticalAlign: "middle",
-                          position: "relative",
-                        }}
-                      >
-                        {globalState.dataCarts.length > 0 ? (
+                  <div>
+                    {globalState.dataUserLogin.level === "costumer" && (
+                      <li className="nav-item">
+                        <Link className="nav-link" to="/cart">
+                          <div
+                            style={{
+                              width: "80px",
+                              textAlign: "center",
+                              verticalAlign: "middle",
+                              position: "relative",
+                            }}
+                          >
+                            {globalState.dataCarts.length > 0 ? (
+                              <>
+                                <span
+                                  style={{
+                                    backgroundColor: "red",
+                                    borderRadius: "50%",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    color: "white",
+                                    position: "absolute",
+                                    right: "14px",
+                                    top: "2px",
+                                    padding: "2px 8px",
+                                    fontSize: "12px",
+                                    fontFamily: "sans-serif",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  {globalState.dataCarts.length}
+                                </span>
+                              </>
+                            ) : (
+                              <></>
+                            )}
+                            {/* {dataCarts.length > 0 ? (
                           <>
                             <span
                               style={{
@@ -90,17 +120,19 @@ export default function Navbar() {
                                 fontWeight: "bold",
                               }}
                             >
-                              {globalState.dataCarts.length}
+                              {dataCarts.length}
                             </span>
                           </>
                         ) : (
                           <></>
-                        )}
+                        )} */}
 
-                        <img src={require("../Images/Vector.png")} alt="" />
-                      </div>
-                    </Link>
-                  </li>
+                            <img src={require("../Images/Vector.png")} alt="" />
+                          </div>
+                        </Link>
+                      </li>
+                    )}
+                  </div>
                   <li className="nav-item dropdown">
                     <a
                       className="nav-link dropdown-toggle"
@@ -108,6 +140,7 @@ export default function Navbar() {
                       role="button"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
+                      style={{ color: "#198754" }}
                     >
                       Hello,{" "}
                       {globalState.dataUserLogin.fullname
@@ -116,15 +149,47 @@ export default function Navbar() {
                     </a>
                     <ul className="dropdown-menu dropdown-menu-end">
                       <li>
-                        <Link className="dropdown-item" to="/Profil">
+                        <Link
+                          className="dropdown-item"
+                          to="/Profil"
+                          style={{ color: "#198754" }}
+                        >
                           <i className="bi bi-person"></i>Profil
                         </Link>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#">
-                          <i className="bi-cash-coin"></i> My transactions
-                        </a>
+                        {globalState.dataUserLogin.level === "costumer" && (
+                          <Link
+                            className="dropdown-item"
+                            to="/my-transactions"
+                            style={{ color: "#198754" }}
+                          >
+                            <i className="bi-cash-coin"></i> My transactions
+                          </Link>
+                        )}
                       </li>
+                      {globalState.dataUserLogin.level === "owner" && (
+                        <li>
+                          <Link
+                            className="dropdown-item"
+                            to="/transactions"
+                            style={{ color: "#198754" }}
+                          >
+                            <i className="bi-cash-coin"></i> Transactions
+                          </Link>
+                        </li>
+                      )}
+                      {globalState.dataUserLogin.level === "owner" && (
+                        <li>
+                          <Link
+                            className="dropdown-item"
+                            to="/data-products"
+                            style={{ color: "#198754" }}
+                          >
+                            <i className="bi-cup-straw"></i> Products
+                          </Link>
+                        </li>
+                      )}
                       <li>
                         <hr className="dropdown-divider" />
                       </li>

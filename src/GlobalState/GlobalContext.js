@@ -13,9 +13,10 @@ export const GlobalContextProvider = (props) => {
 };
 
 const initialState = {
-  myName: "Jun",
+  myName: "",
   // isLogin: isLogin,
   idProduct: "",
+  prducts: [],
   dataCarts: [],
   isLogin: false,
   dataUserLogin: [],
@@ -28,6 +29,11 @@ const reducer = (state, action) => {
       ...state,
       isLogin: true,
       dataUserLogin: action.data,
+    };
+  } else if (action.type === "PROCCESS_GET_DATA_CART") {
+    return {
+      ...state,
+      dataCarts: action.data,
     };
   } else if (action.type === "GET_IDPRODUCT") {
     return {

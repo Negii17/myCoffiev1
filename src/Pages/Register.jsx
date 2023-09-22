@@ -8,6 +8,7 @@ export default function Register() {
   const navigate = useNavigate();
   const [fullNameInput, setFullNameInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
+  const [userNameInput, setUserNameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
   const [confirmPasswordInput, setConfirmPasswordInput] = useState("");
   const [messageAlert, setMessageAlret] = useState("");
@@ -21,12 +22,13 @@ export default function Register() {
 
     if (passwordInput !== confirmPasswordInput) {
       setMessageAlret(`konfirmasi passwor tidak cocok`);
-      console.log(messageAlert);
+
       return;
     }
     try {
       // setMessageAlret("");
       const response = await ApiVersi1.post("/register", {
+        userName: userNameInput,
         email: emailInput,
         fullName: fullNameInput,
         password: passwordInput,
@@ -52,20 +54,24 @@ export default function Register() {
                 <form onSubmit={handleRegister}>
                   {messageAlert !== "" && (
                     <div
-                      className={`alert alert-dismissible fade show ${
-                        statusAlert === "succes"
+                      style={{
+                        width: "30%",
+                        display: "flex",
+                        justifyContent: "center",
+                        position: "fixed",
+                        alignItems: "center",
+                        right: "4px",
+                        left: "4px",
+                        top: "10px",
+                      }}
+                      className={`alert ${
+                        statusAlert === "success"
                           ? "alert-success"
                           : "alert-danger"
                       }`}
                       role="alert"
                     >
                       {messageAlert}
-                      <button
-                        type="button"
-                        className="btn-close"
-                        data-bs-dismiss="alert"
-                        aria-label="Close"
-                      ></button>
                     </div>
                   )}
                   <h1
@@ -78,6 +84,17 @@ export default function Register() {
                     Register
                   </h1>
                   <div className="mb-3 mt-4">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="User Name"
+                      value={userNameInput}
+                      onChange={(e) => {
+                        setUserNameInput(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="mb-3 mt-2">
                     <input
                       type="text"
                       className="form-control"
@@ -159,11 +176,16 @@ export default function Register() {
                     <button
                       className="btn btn-outline-success w-100 mb-3"
                       type="submit"
+                      setTimeout={
+                        (() => {
+                          statusAlert === "success" && navigate("/");
+                        },
+                        3000)
+                      }
                     >
                       Create Account
                     </button>
                     <div style={{ marginTop: "-10px" }}>
-                      {" "}
                       <p
                         style={{
                           textAlign: "center",

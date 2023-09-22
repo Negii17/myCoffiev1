@@ -62,12 +62,21 @@ export default function Login() {
     <div className="container">
       <div className="row">
         <div className="col-lg-4"></div>
-
         <div className="col-lg-4" style={{ marginTop: "80px" }}>
           <div className="card shadow">
             <div className="card-body ">
               {messageAlert !== "" && (
                 <div
+                  style={{
+                    width: "30%",
+                    display: "flex",
+                    justifyContent: "center",
+                    position: "fixed",
+                    alignItems: "center",
+                    right: "4px",
+                    left: "4px",
+                    top: "10px",
+                  }}
                   className={`alert ${
                     statusAlert === "succes" ? "alert-success" : "alert-danger"
                   }`}
