@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 // import { dataProduct } from "./Products/Data";
 import { GlobalContext } from "../GlobalState/GlobalContext";
 import { useNavigate } from "react-router-dom";
-import { ApiVersi1 } from "../Config/ApiConfig";
+import { ApiVersi1, ApiVersi2 } from "../Config/ApiConfig";
 import { formatRupiah } from "../Config/Config";
 
 export default function Home() {
@@ -14,14 +14,19 @@ export default function Home() {
 
   const setFormatRupiah = formatRupiah;
   const [allDataProducts, setAllDataProducts] = useState([]);
+  const [image, setImage] = useState("");
+
   const getDataProductApi = async () => {
     const response = await ApiVersi1.get("/getdataproducts");
+
     // console.log(response);
     setAllDataProducts(response.data.data);
   };
+  const getImage = async (id) => {
+    const response = await ApiVersi2.get(`/uploads/${id}`);
 
-  // const [searchResultsDataProduct, setsearchResultsDataProduct] =
-  //   useState(allDataProducts);
+    console.log(response);
+  };
 
   const handleOrder = (id) => {
     if (globalState.isLogin) {
@@ -36,12 +41,12 @@ export default function Home() {
     }
   };
 
-  const handleOrder2 = async (idParam) => {
+  const handleOrder2 = async (id) => {
     try {
       const token = localStorage.token;
       const response = await ApiVersi1.post(
         "/adddatacart",
-        { productId: idParam },
+        { productId: id },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -55,7 +60,10 @@ export default function Home() {
 
   const getDataCart = async () => {
     try {
-      const response = await ApiVersi1.get("/getdatacart");
+      const token = localStorage.token;
+      const response = await ApiVersi1.get("/getdatacart", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       // setDataCarts(response.data.data);
       globalDispatch({
         type: "PROCCESS_GET_DATA_CART",
@@ -89,21 +97,29 @@ export default function Home() {
             return (
               <div key={index} className="col">
                 <div className="card shadow ">
+                  <button
+                    onClick={() => {
+                      getImage(item.img);
+                    }}
+                  >
+                    view
+                  </button>
                   <div
                     style={{
                       backgroundColor: "#FDF5E6",
                     }}
                   >
                     <img
-                    // src={require(`../Images/${item.img}`)}
-                    // className="card-img-top"
-                    // alt="..."
-                    // style={{
-                    //   height: "20rem",
-                    //   width: "18rem",
-                    //   margin: "0.5rem",
-                    // }}
+                      src={image}
+                      className="card-img-top"
+                      alt="..."
+                      style={{
+                        height: "20rem",
+                        width: "18rem",
+                        margin: "0.5rem",
+                      }}
                     />
+
                     <div className="card-body">
                       <h5 className="card-title">{item.productName}</h5>
                       <p className="card-text">{setFormatRupiah(item.price)}</p>

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 
 import Navbar from "./Components/Navbar";
@@ -24,6 +24,8 @@ import Transactions from "./Pages/Transactions";
 import { formToJSON } from "axios";
 
 function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [globalState, globalDispacth] = useContext(GlobalContext);
 
   // const [tesInput, setTesInput] = useState("");
@@ -36,7 +38,10 @@ function App() {
 
   const getDataCart = async () => {
     try {
-      const response = await ApiVersi1.get("/getdatacart");
+      const token = localStorage.token;
+      const response = await ApiVersi1.get("/getdatacart", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       // setDataCarts(response.data.data);
       globalDispacth({
         type: "PROCCESS_GET_DATA_CART",
@@ -69,6 +74,7 @@ function App() {
           //   },
           // ],
         });
+        navigate(location.pathname);
       }
     } catch (error) {
       console.log(error);
@@ -76,7 +82,7 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
+    <>
       <Navbar />
       {/* <input
         type="text"
@@ -88,7 +94,6 @@ function App() {
       <Routes>
         <Route path="*" element={<PageNotFound />} />
         <Route path="/" element={<Home />} />
-
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -101,13 +106,12 @@ function App() {
         </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/detail-products/:id" element={<DetailProucts />} />
-          {/* <Route path="/Cart" element={<Cart />} /> */}
           <Route path="/Cart" element={<Cart2 />} />
           <Route path="/Profil" element={<Profil />} />
           <Route path="/my-transactions" element={<MyTransactions />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </>
   );
 }
 

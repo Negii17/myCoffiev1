@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { ApiVersi1 } from "../../Config/ApiConfig";
 
 export default function AddProducts() {
+  const [changeImage, setChangeImage] = useState("");
+  const [uploadImage, setUploadImage] = useState("");
   const [idInput, setIdInput] = useState("");
   const [productNameInput, setProductNameInput] = useState("");
   const [priceInput, setPriceInput] = useState("");
@@ -13,12 +15,26 @@ export default function AddProducts() {
     e.preventDefault();
 
     try {
-      const response = await ApiVersi1.post("/adddataproduct", {
-        id: idInput,
-        productName: productNameInput,
-        price: priceInput,
-        stocks: stocksInput,
-      });
+      if (changeImage === "") {
+        console.log("file gambar harus ada");
+      }
+      const token = localStorage.token;
+      const response = await ApiVersi1.post(
+        "/adddataproduct",
+        {
+          img: uploadImage,
+          id: idInput,
+          productName: productNameInput,
+          price: priceInput,
+          stocks: stocksInput,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       console.log(response);
       setMessageAlret(response.data.message);
       setStatusAlert(response.data.status);
@@ -67,28 +83,42 @@ export default function AddProducts() {
           >
             Tambah Produk
           </p>
-
-          <div className="row">
-            <div className="col-lg-3">
-              <div>
-                <img src={require("../../Images/Coffeland.jpg")} alt="" />
+          <form onSubmit={handleAddProduct}>
+            <div className="row">
+              <div className="col-lg-3">
+                <div>
+                  <img
+                    src={
+                      changeImage === ""
+                        ? require("../../Images/image-preview.png")
+                        : changeImage
+                    }
+                    alt=""
+                    className="img-thumbnail shadow"
+                  />
+                </div>
+                <div className="mb-3">
+                  <input
+                    className="form-control"
+                    type="file"
+                    id="formFile"
+                    onChange={(e) => {
+                      setChangeImage(URL.createObjectURL(e.target.files[0]));
+                      setUploadImage(e.target.files[0]);
+                    }}
+                  />
+                </div>
               </div>
-              <div className="mb-3">
-                <label htmlFor="formFile" className="form-label"></label>
-                <input className="form-control" type="file" id="formFile" />
+              <div
+                className="col-lg-2"
+                style={{ marginTop: "35px", fontSize: "20px" }}
+              >
+                <p>Id Produk : </p>
+                <p>Nama Produk :</p>
+                <p>Harga Produk :</p>
+                <p>Jumlah Stok :</p>
               </div>
-            </div>
-            <div
-              className="col-lg-2"
-              style={{ marginTop: "35px", fontSize: "20px" }}
-            >
-              <p>Id Produk : </p>
-              <p>Nama Produk :</p>
-              <p>Harga Produk :</p>
-              <p>Jumlah Stok :</p>
-            </div>
-            <div className="col-lg-4" style={{ marginTop: "30px" }}>
-              <form onSubmit={handleAddProduct}>
+              <div className="col-lg-4" style={{ marginTop: "30px" }}>
                 <input
                   className="form-control"
                   style={{ marginBottom: "10px" }}
@@ -98,6 +128,7 @@ export default function AddProducts() {
                   }}
                 />
                 <input
+                  type="text"
                   className="form-control"
                   style={{ marginBottom: "10px" }}
                   value={productNameInput}
@@ -106,6 +137,7 @@ export default function AddProducts() {
                   }}
                 />
                 <input
+                  type="text"
                   className="form-control"
                   style={{ marginBottom: "10px" }}
                   value={priceInput}
@@ -114,6 +146,7 @@ export default function AddProducts() {
                   }}
                 />
                 <input
+                  type="text"
                   className="form-control"
                   style={{ marginBottom: "10px" }}
                   value={stocksInput}
@@ -133,9 +166,9 @@ export default function AddProducts() {
                 >
                   Add Product
                 </button>
-              </form>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>

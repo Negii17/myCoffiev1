@@ -27,15 +27,21 @@ export default function DataProducts() {
     setAllDataProducts(response.data.data);
   };
 
- 
-
   const updateProduct = async (e) => {
     e.preventDefault();
     try {
-      console.log(stocksInput);
-      const response = await ApiVersi1.patch(`/updatedataproduct/${idEdit}`, {
-        stocks: stocksInput,
-      });
+      const token = localStorage.token;
+      const response = await ApiVersi1.patch(
+        `/updatedataproduct/${idEdit}`,
+        {
+          stocks: stocksInput,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       getDataProductApi();
       console.log(response);
       setMessageAlret(response.data.message);
@@ -52,7 +58,12 @@ export default function DataProducts() {
 
   const DeleteProduct = async (idParam) => {
     try {
-      await ApiVersi1.delete(`/deletedataproduct/${idParam}`);
+      const token = localStorage.token;
+      await ApiVersi1.delete(`/deletedataproduct/${idParam}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       getDataProductApi();
     } catch (error) {
       console.log(error);

@@ -1,27 +1,52 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "../GlobalState/GlobalContext";
 import { ApiVersi1 } from "../Config/ApiConfig";
 
 export default function Profil() {
-  const [globalState, globalDispatch] = useContext(GlobalContext);
+  useEffect(() => {
+    getDataUserById();
+  }, []);
+
+  const [editUser, setEditUser] = useState("");
+  const [editPasswordUser, setEditPasswordUser] = useState("");
+  const [dataUserById, setDataUserById] = useState([]);
 
   const [fullNameInput, setFullNameInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
-  const [newPasswordInput, setNewPassword] = useState("");
 
   const [messageAlert, setMessageAlret] = useState("");
   const [statusAlert, setStatusAlert] = useState("");
 
-  const token = localStorage.getItem("token");
-
+  const getDataUserById = async () => {
+    try {
+      const token = localStorage.token;
+      const response = await ApiVersi1.get("/getuserbyid", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setDataUserById(response.data.dataUser);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const updateUser = async (e) => {
     e.preventDefault();
     try {
-      const response = await ApiVersi1.patch(`/updatedatauser/${globalState}`, {
-        fullName: fullNameInput,
-        email: emailInput,
-      });
+      const token = localStorage.token;
+      const response = await ApiVersi1.patch(
+        `/updatedatauser/${editUser}`,
+        {
+          fullName: fullNameInput,
+          email: emailInput,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setMessageAlret(response.data.message);
       setStatusAlert(response.data.status);
@@ -34,11 +59,16 @@ export default function Profil() {
   const updatePassword = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.token;
       const response = await ApiVersi1.patch(
-        `/updatepassworduser/${globalState.dataUserLogin.id}`,
+        `/updatepassworduser/${editUser}`,
         {
           password: passwordInput,
-          newPassword: newPasswordInput,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       console.log(response);
@@ -95,11 +125,13 @@ export default function Profil() {
               </p>
               <input
                 className="form-control"
-                style={{ width: "350px", height: "40px", marginLeft: "30px" }}
+                style={{
+                  width: "350px",
+                  height: "40px",
+                  marginLeft: "30px",
+                }}
                 placeholder={
-                  globalState.dataUserLogin.fullname
-                    ? globalState.dataUserLogin.fullname
-                    : "Unknown"
+                  dataUserById.fullname ? dataUserById.fullname : "Unknown"
                 }
                 value={fullNameInput}
                 onChange={(e) => {
@@ -127,9 +159,7 @@ export default function Profil() {
                   marginBottom: "30px",
                 }}
                 placeholder={
-                  globalState.dataUserLogin.email
-                    ? globalState.dataUserLogin.email
-                    : "Unknown"
+                  dataUserById.email ? dataUserById.email : "Unknown"
                 }
                 value={emailInput}
                 onChange={(e) => {
@@ -146,7 +176,7 @@ export default function Profil() {
                     }}
                     type="submit"
                     onClick={() => {
-                      globalDispatch();
+                      setEditUser(dataUserById.id);
                     }}
                   >
                     Update Save
@@ -200,22 +230,10 @@ export default function Profil() {
                             marginBottom: "10px",
                             marginLeft: "30px",
                           }}
-                          placeholder="Password lama"
+                          placeholder="New Password"
                           value={passwordInput}
                           onChange={(e) => {
                             setPasswordInput(e.target.value);
-                          }}
-                        />
-                        <input
-                          className="form-control"
-                          style={{
-                            marginBottom: "10px",
-                            marginLeft: "30px",
-                          }}
-                          placeholder="Password Baru"
-                          value={newPasswordInput}
-                          onChange={(e) => {
-                            setNewPassword(e.target.value);
                           }}
                         />
                       </div>
@@ -233,6 +251,9 @@ export default function Profil() {
                         className="btn btn-outline-success"
                         style={{ width: "80px" }}
                         data-bs-dismiss="modal"
+                        onClick={() => {
+                          setEditUser(dataUserById.id);
+                        }}
                       >
                         Save
                       </button>

@@ -1,41 +1,77 @@
 import React, { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "../GlobalState/GlobalContext";
 import { ApiVersi1 } from "../Config/ApiConfig";
+import { formatRupiah } from "../Config/Config";
 
 export default function Cart2() {
   const [globalState, globalDispacth] = useContext(GlobalContext);
   const [dataCarts, setDataCarts] = useState([]);
-  console.log("ini Cart", dataCarts);
-  const [dataProduct, setDataProduct] = useState([]);
-  console.log(dataProduct);
 
   useEffect(() => {
     getDataCart();
   }, []);
-  useEffect(() => {
-    getDataProductApiById();
-  }, []);
 
   const getDataCart = async () => {
     try {
-      const response = await ApiVersi1.get("/getdatacart");
+      const token = localStorage.token;
+      const response = await ApiVersi1.get("/getdatacart", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log(response);
       setDataCarts(response.data.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getDataProductApiById = async () => {
+  const addQtyProduct = async (id) => {
     try {
-      const response = await ApiVersi1.get(
-        `/getdataproductbyid/${dataProduct.data.data.length.productId}`
+      const token = localStorage.token;
+      const response = await ApiVersi1.post(
+        "/adddatacart",
+        { productId: id },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
-      setDataProduct(response.data.data);
       console.log(response);
+      getDataCart();
     } catch (error) {
       console.log(error);
     }
   };
+  const reduceQtyProduct = async (id) => {
+    try {
+      const token = localStorage.token;
+      const response = await ApiVersi1.post(
+        "/reduceqtyproduct",
+        { productId: id },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      // console.log(response);
+      getDataCart();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const deleteCart = async (id) => {
+    try {
+      const token = localStorage.token;
+      const response = await ApiVersi1.delete(`/deletecart/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      getDataCart();
+      // console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  let totalHarga = 0;
+  dataCarts.forEach((item) => {
+    totalHarga += item.Product.price * item.qty;
+  });
 
   return (
     <div>
@@ -49,24 +85,18 @@ export default function Cart2() {
         >
           My Cart
         </h2>
-        <pre>{JSON.stringify(globalState.dataCarts, null, 2)}</pre>
-        <div className="row">
-          <div>
-            {globalState.dataCarts.length > 0 ? (
-              <>
-                {dataCarts.map((item, index) => {
-                  return (
-                    <div key={index} className="col-lg-8">
-                      <div className="scrollbox" style={{ overflow: "auto" }}>
-                        <div
-                          data-bs-spy="scroll"
-                          data-bs-root-margin="0px 0px -40%"
-                          data-bs-smooth-scroll="true"
-                          className="scrollspy-example bg-light p-3 rounded-2"
-                          tabIndex="0"
-                        >
-                          <ul className="list-group list-group-flush">
-                            <div>
+        {/* <pre>{JSON.stringify(globalState.dataCarts, null, 2)}</pre> */}
+        <div>
+          {globalState.dataCarts.length > 0 ? (
+            <>
+              <div className="row">
+                <div className="col-lg-8">
+                  <div className="scrollbox">
+                    <div>
+                      <ul className="list-group list-group-flush">
+                        {dataCarts.map((item, index) => {
+                          return (
+                            <div key={index}>
                               <li className="list-group-item">
                                 <div className="row">
                                   <div className="col-lg-1">
@@ -100,7 +130,7 @@ export default function Cart2() {
                                         color: "#198754",
                                       }}
                                     >
-                                      {/* {globalState.dataProduct.productName} */}
+                                      {item.Product.productName}
                                     </span>
                                     <br />
                                     <span
@@ -109,8 +139,9 @@ export default function Cart2() {
                                         color: "#198754",
                                       }}
                                     >
-                                      {/* Harga : {globalState.dataProduct.price} */}
+                                      Harga : {item.Product.price}
                                     </span>
+
                                     <div
                                       style={{
                                         width: "120px",
@@ -118,7 +149,12 @@ export default function Cart2() {
                                       }}
                                       className="input-group mb-3"
                                     >
-                                      <span className="btn btn-outline-danger">
+                                      <span
+                                        className="btn btn-outline-danger"
+                                        onClick={() => {
+                                          reduceQtyProduct(item.Product.id);
+                                        }}
+                                      >
                                         -
                                       </span>
                                       <input
@@ -128,7 +164,12 @@ export default function Cart2() {
                                         value={item.qty}
                                         readOnly
                                       />
-                                      <span className="btn btn-outline-success">
+                                      <span
+                                        className="btn btn-outline-success"
+                                        onClick={() => {
+                                          addQtyProduct(item.Product.id);
+                                        }}
+                                      >
                                         +
                                       </span>
                                     </div>
@@ -141,7 +182,12 @@ export default function Cart2() {
                                       marginLeft: "210px",
                                     }}
                                   >
-                                    <button className="btn btn-danger">
+                                    <button
+                                      className="btn btn-danger"
+                                      onClick={() => {
+                                        deleteCart(item.id);
+                                      }}
+                                    >
                                       <i className="bi bi-trash"></i>
                                     </button>
                                   </div>
@@ -156,26 +202,64 @@ export default function Cart2() {
                                       }}
                                     >
                                       Sub Total :
+                                      {formatRupiah(
+                                        item.Product.price * item.qty
+                                      )}
                                     </p>
                                   </div>
                                 </div>
                               </li>
                             </div>
-                          </ul>
-                        </div>
-                      </div>
+                          );
+                        })}
+                      </ul>
                     </div>
-                  );
-                })}
-              </>
-            ) : (
-              <>
-                <div className="alert alert-danger" role="alert">
-                  Keranjang Kosong
+                  </div>
                 </div>
-              </>
-            )}
-          </div>
+                <div className="col-lg-4">
+                  <div>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Alamat"
+                      style={{ marginBottom: "5px", width: "90%" }}
+                    />
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Kode pos"
+                      style={{ marginBottom: "5px", width: "90%" }}
+                    />
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Catatan"
+                      style={{ marginBottom: "5px", width: "90%" }}
+                    />
+
+                    <p style={{ marginTop: "70px", marginBottom: "0" }}>
+                      Tax: Rp. 0
+                    </p>
+                    <p style={{ color: "#198754" }}>
+                      Total Harga: {formatRupiah(totalHarga)}
+                    </p>
+                    <button
+                      className="btn btn-outline-success w-80"
+                      style={{ marginLeft: "20%" }}
+                    >
+                      Payment
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="alert alert-danger" role="alert">
+                Keranjang Kosong
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

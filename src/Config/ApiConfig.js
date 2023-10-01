@@ -5,6 +5,9 @@ import axios from "axios";
 export const ApiVersi1 = axios.create({
   baseURL: "http://localhost:3001/api/v1",
 });
+export const ApiVersi2 = axios.create({
+  baseURL: "http://localhost:3001/api/v2",
+});
 
 // const [globalState, globalDispacth] = useContext(GlobalContext);
 
